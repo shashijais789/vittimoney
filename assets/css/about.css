@@ -1,0 +1,93 @@
+/* ==========================================================================
+   vitti — about.css
+   Styles for the About page. Load after base.css.
+   ========================================================================== */
+
+.page-head{ padding:72px 0 36px; }
+.page-eyebrow{
+  font-family:var(--font-mono);
+  font-size:12px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--accent);
+  display:flex;
+  align-items:center;
+  gap:9px;
+  margin-bottom:16px;
+}
+.page-eyebrow::before{ content:""; width:14px; height:1px; background:var(--accent); }
+.page-head h1{
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:clamp(34px,5vw,60px);
+  letter-spacing:-0.02em;
+  line-height:1.05;
+  max-width:18ch;
+}
+.page-head h1 .accent{ color:var(--accent); }
+.page-sub{
+  margin-top:18px;
+  font-size:17px;
+  line-height:1.65;
+  color:var(--text-muted);
+  max-width:64ch;
+}
+
+section{ margin-top:64px; }
+section h2{
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:26px;
+  letter-spacing:-0.01em;
+  margin-bottom:16px;
+}
+
+.story p{
+  font-size:16px;
+  line-height:1.7;
+  color:var(--text-muted);
+  max-width:68ch;
+}
+.story p + p{ margin-top:14px; }
+.story em{ font-style:italic; color:var(--text); }
+
+.work-list{ list-style:none; }
+.work-list li{
+  display:flex;
+  gap:20px;
+  padding:18px 0;
+  border-top:1px solid var(--border);
+}
+.work-list li:last-child{ border-bottom:1px solid var(--border); }
+.work-num{
+  font-family:var(--font-mono);
+  font-size:12px;
+  color:var(--accent);
+  letter-spacing:0.06em;
+  padding-top:4px;
+}
+.work-list h3{ font-size:16px; font-weight:600; }
+.work-list p{ margin-top:4px; font-size:14px; color:var(--text-muted); }
+
+.principles{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:24px;
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  padding:32px 0;
+}
+@media (max-width:720px){ .principles{ grid-template-columns:1fr; } }
+.principles .num{ font-family:var(--font-mono); font-size:11px; color:var(--accent); letter-spacing:0.08em; }
+.principles h4{ margin-top:10px; font-size:15px; font-weight:600; }
+.principles p{ margin-top:6px; font-size:13.5px; color:var(--text-muted); line-height:1.55; }
+
+.contact{ padding-bottom:8px; }
+.contact p{ font-size:16px; color:var(--text-muted); }
+.mail{ color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-soft); }
+.mail:hover{ border-bottom-color:var(--accent); }
+
+@media (max-width:768px){
+  .page-head{ padding:52px 0 28px; }
+  section{ margin-top:48px; }
+}

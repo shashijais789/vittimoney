@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Loan Calculator — VittiMoney</title>
+<meta name="description" content="Full home loan amortisation with prepayments, rate changes and a downloadable month-by-month breakdown.">
+<meta property="og:title" content="Home Loan Calculator — VittiMoney">
+<meta property="og:description" content="Full home loan amortisation with prepayments, rate changes and a downloadable month-by-month breakdown.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://vittimoney.com/calculators/home-loan/">
+<meta property="og:image" content="/assets/og/og-image.png">
+<link rel="icon" type="image/svg+xml" href="../../assets/icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/css/base.css">
+<link rel="stylesheet" href="../../assets/css/calculator.css">
+</head>
+<body>
+
+<nav>
+  <div class="container nav-inner">
+    <a href="../../index.html" class="brand"><span class="brand-mark">v</span>VittiMoney</a>
+    <div class="nav-links">
+      <a href="../index.html" class="hide-sm">Tools</a>
+      <a href="../../about/index.html" class="hide-sm">About</a>
+      <div class="theme-toggle" role="group" aria-label="Theme">
+        <button id="btn-dark" aria-label="Dark mode">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>
+        </button>
+        <button id="btn-light" aria-label="Light mode">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="container">
+  <header class="page-head">
+    <p class="page-eyebrow">Calculator · Home loan</p>
+    <h1>Home Loan Calculator</h1>
+    <p class="page-sub">Work out your EMI with prepayments, rate changes and a full month-by-month breakdown.</p>
+  </header>
+
+  <div class="app">
+    <div class="form-card">
+      <div class="form-top">
+        <div class="form-actions">
+          <select id="currency" class="currency-select">
+            <option value="&#8377;" selected>&#8377; (INR)</option>
+            <option value="$">$ (USD)</option>
+            <option value="&#163;">&#163; (GBP)</option>
+            <option value="&#8364;">&#8364; (EUR)</option>
+            <option value="&#165;">&#165; (JPY)</option>
+            <option value="R$">R$ (BRL)</option>
+          </select>
+          <button class="save-btn" id="saveBtn">Save</button>
+          <span class="save-msg" id="saveMsg">Saved!</span>
+        </div>
+      </div>
+
+      <div class="form-fields">
+        <div class="form-group input-suffix" data-suffix="&#8377;">
+          <label for="amount">Loan Amount</label>
+          <input type="number" id="amount" placeholder="50,00,000" min="0" value="10000000">
+        </div>
+        <div class="form-group input-suffix" data-suffix="%">
+          <label for="rate">Annual Interest Rate</label>
+          <input type="number" id="rate" placeholder="6.5" step="0.1" min="0" value="8.3">
+        </div>
+        <div class="form-group input-suffix" data-suffix="yrs">
+          <label for="years">Loan Term</label>
+          <input type="number" id="years" placeholder="30" min="1" max="50" value="20">
+        </div>
+        <div class="form-group">
+          <label for="startDate">First EMI Date</label>
+          <input type="date" id="startDate">
+        </div>
+        <div class="form-group input-suffix" data-suffix="&#8377;">
+          <label for="fixedEmi">Fixed EMI <span class="opt-label">optional</span></label>
+          <input type="number" id="fixedEmi" placeholder="Auto" min="0" step="0.01">
+        </div>
+      </div>
+
+      <div class="events-layout">
+        <div class="events-col">
+          <div class="section-label">Events</div>
+          <div id="eventList"></div>
+          <button class="outline" id="addEvent">+ Add Event</button>
+        </div>
+        <div class="calc-col">
+          <button class="calc-btn" id="calculate">Calculate</button>
+          <div class="error" id="error"></div>
+          <div class="results" id="results">
+            <div class="result-row">
+              <span class="result-label">Monthly EMI</span>
+              <span class="result-value highlight" id="monthly">₹0</span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">Total Payment</span>
+              <span class="result-value" id="total">₹0</span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">Total Interest</span>
+              <span class="result-value" id="interest">₹0</span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">Original Last EMI Date</span>
+              <span class="result-value result-date" id="originalEndDate">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="schedule-section" id="scheduleSection">
+      <div class="summary-new">
+        <div class="summary-box">
+          <div class="summary-box-title">
+            Till Date
+            <span class="info-icon" title="Count of EMIs paid till date">i</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">EMIs Paid</span>
+            <span class="summary-value" id="sumEmisPaid">0</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Total EMI Amount Paid</span>
+            <span class="summary-value" id="sumTotalEmi">₹0</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Principal Paid</span>
+            <span class="summary-value" id="sumPrincipalPaid">₹0</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Interest Paid</span>
+            <span class="summary-value" id="sumInterestPaid">₹0</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Pre-payments</span>
+            <span class="summary-value" id="sumPrepayments">₹0</span>
+          </div>
+          <div class="summary-row summary-total">
+            <span class="summary-label">Total Principal Paid</span>
+            <span class="summary-value" id="sumTotalPrincipalPaid">₹0</span>
+          </div>
+        </div>
+        <div class="summary-box">
+          <div class="summary-box-title">Remaining</div>
+          <div class="summary-row">
+            <span class="summary-label">EMIs Left</span>
+            <span class="summary-value" id="sumEmisLeft">0</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Principal Left</span>
+            <span class="summary-value" id="sumLeft">₹0</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Effective Last EMI Date</span>
+            <span class="summary-value highlight" id="sumLastEmiDate">—</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="eventsSummary" class="events-summary" style="display:none">
+        <h3>Events Summary</h3>
+        <div class="events-summary-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Event Type</th>
+                <th>Effective Date</th>
+                <th>Value</th>
+                <th>Per-event Impact</th>
+                <th>Cumulative Impact</th>
+                <th>Last EMI Date</th>
+              </tr>
+            </thead>
+            <tbody id="eventsSummaryBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="schedule-header">
+        <h2>Month-wise Breakdown</h2>
+        <div class="schedule-header-actions">
+          <span id="scheduleCount"></span>
+          <button id="downloadPdf">Download PDF</button>
+        </div>
+      </div>
+      <div class="schedule-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Due Date</th>
+              <th>Rate</th>
+              <th>EMI</th>
+              <th>Principal</th>
+              <th>Interest</th>
+              <th>Prepay</th>
+              <th>Balance</th>
+            </tr>
+          </thead>
+          <tbody id="scheduleBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span>vittimoney.com</span>
+    <span>© 2026 VittiMoney</span>
+  </footer>
+</main>
+
+<script src="../../assets/js/theme.js"></script>
+<script>
+    const amountInput = document.getElementById('amount');
+    const rateInput = document.getElementById('rate');
+    const yearsInput = document.getElementById('years');
+    const startDateInput = document.getElementById('startDate');
+    const fixedEmiInput = document.getElementById('fixedEmi');
+    const calculateBtn = document.getElementById('calculate');
+    const resultsDiv = document.getElementById('results');
+    const errorDiv = document.getElementById('error');
+    const monthlyEl = document.getElementById('monthly');
+    const totalEl = document.getElementById('total');
+    const interestEl = document.getElementById('interest');
+    const scheduleSection = document.getElementById('scheduleSection');
+    const scheduleBody = document.getElementById('scheduleBody');
+    const scheduleCount = document.getElementById('scheduleCount');
+    const sumEmi = document.getElementById('sumEmi');
+    const sumPrincipal = document.getElementById('sumPrincipal');
+    const sumInterest = document.getElementById('sumInterest');
+    const sumLeft = document.getElementById('sumLeft');
+    const sumEmisLeft = document.getElementById('sumEmisLeft');
+    const currencySelect = document.getElementById('currency');
+    const saveBtn = document.getElementById('saveBtn');
+    const saveMsg = document.getElementById('saveMsg');
+    const eventList = document.getElementById('eventList');
+    const addEventBtn = document.getElementById('addEvent');
+
+    let currencySymbol = '₹';
+    let events = [];
+
+    currencySelect.addEventListener('change', () => {
+      currencySymbol = currencySelect.value;
+      document.querySelectorAll('.input-suffix[data-suffix]').forEach(el => {
+        if (['$', 'R$', '\u00A5', '\u00A3', '\u20AC', '\u20B9'].includes(el.dataset.suffix)) {
+          el.dataset.suffix = currencySymbol;
+        }
+      });
+      if (scheduleSection.classList.contains('show')) runCalculation();
+    });
+
+    function showSaved() {
+      saveMsg.classList.add('show');
+      setTimeout(() => saveMsg.classList.remove('show'), 2000);
+    }
+
+    function createEventEntry(type, dateVal, valueVal) {
+      const div = document.createElement('div');
+      div.className = 'event-entry';
+      const isRate = type === 'rate';
+      div.innerHTML = `
+        <select class="event-type">
+          <option value="prepay" ${type === 'prepay' ? 'selected' : ''}>Prepayment</option>
+          <option value="rate" ${isRate ? 'selected' : ''}>Rate Change</option>
+        </select>
+        <input type="date" class="event-date" value="${dateVal || ''}">
+        <input type="number" class="event-value" placeholder="${isRate ? 'Rate %' : 'Amount'}" min="0" step="${isRate ? '0.05' : '0.01'}" value="${valueVal || ''}">
+        <button class="danger">&times;</button>
+      `;
+      div.querySelector('.event-type').addEventListener('change', function() {
+        const valInput = div.querySelector('.event-value');
+        if (this.value === 'rate') {
+          valInput.placeholder = 'Rate %';
+          valInput.step = '0.05';
+        } else {
+          valInput.placeholder = 'Amount';
+          valInput.step = '0.01';
+        }
+        rebuildEvents();
+        if (scheduleSection.classList.contains('show')) runCalculation();
+      });
+      div.querySelector('.danger').addEventListener('click', () => {
+        div.remove();
+        rebuildEvents();
+        if (scheduleSection.classList.contains('show')) runCalculation();
+      });
+      div.querySelectorAll('input').forEach(inp => {
+        inp.addEventListener('input', () => {
+          rebuildEvents();
+          if (scheduleSection.classList.contains('show')) runCalculation();
+        });
+      });
+      eventList.appendChild(div);
+      events.push({ type, date: dateVal || '', value: valueVal || '' });
+    }
+
+    function rebuildEvents() {
+      const entries = eventList.querySelectorAll('.event-entry');
+      events = [];
+      entries.forEach(e => {
+        const type = e.querySelector('.event-type').value;
+        const date = e.querySelector('.event-date').value;
+        const value = parseFloat(e.querySelector('.event-value').value);
+        if (date && !isNaN(value) && value > 0) {
+          events.push({ type, date, value });
+        }
+      });
+    }
+
+    addEventBtn.addEventListener('click', () => createEventEntry('prepay', '', ''));
+
+    function formatMoney(n) {
+      if (n == null || isNaN(n)) n = 0;
+      const [intPart, decPart] = n.toFixed(2).split('.');
+      const last3 = intPart.slice(-3);
+      const rest = intPart.slice(0, -3);
+      if (rest) {
+        return currencySymbol + rest.replace(/\B(?=(\d{2})+(?!\d))/g, ',') + ',' + last3 + '.' + decPart;
+      }
+      return currencySymbol + last3 + '.' + decPart;
+    }
+
+    function calculateEMI(principal, annualRate, years) {
+      const monthlyRate = annualRate / 100 / 12;
+      const n = years * 12;
+      if (monthlyRate === 0) return principal / n;
+      return principal * monthlyRate * Math.pow(1 + monthlyRate, n) / (Math.pow(1 + monthlyRate, n) - 1);
+    }
+
+    function addMonths(date, n) {
+      const d = new Date(date);
+      d.setMonth(d.getMonth() + n);
+      return d;
+    }
+
+    function formatDate(date) {
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return date.getDate() + ' ' + months[date.getMonth()] + ' ' + date.getFullYear();
+    }
+
+    function buildSchedule(principal, annualRate, years, startDate, prepays, rates, fixedEmi) {
+      const calculatedEmi = calculateEMI(principal, annualRate, years);
+      const emi = fixedEmi > calculatedEmi ? fixedEmi : calculatedEmi;
+      const maxMonths = 600;
+      const rows = [];
+      let balance = principal;
+      let currentRate = annualRate;
+
+      const prepayMap = {};
+      prepays.forEach(p => {
+        const d = new Date(p.date + 'T00:00:00');
+        const key = d.getFullYear() + '-' + d.getMonth();
+        prepayMap[key] = (prepayMap[key] || 0) + p.amount;
+      });
+
+      const sortedRates = [...rates].sort((a, b) => new Date(a.date) - new Date(b.date));
+      let rateIdx = 0;
+
+      for (let i = 1; i <= maxMonths; i++) {
+        if (balance <= 0) break;
+        const dueDate = addMonths(startDate, i - 1);
+        const key = dueDate.getFullYear() + '-' + dueDate.getMonth();
+
+        while (rateIdx < sortedRates.length) {
+          const rDate = new Date(sortedRates[rateIdx].date + 'T00:00:00');
+          if (rDate <= dueDate) {
+            currentRate = sortedRates[rateIdx].rate;
+            rateIdx++;
+          } else break;
+        }
+
+        const monthlyRate = currentRate / 100 / 12;
+        const interest = balance * monthlyRate;
+        let principalPart = emi - interest;
+        if (principalPart > balance) principalPart = balance;
+        if (principalPart < 0) principalPart = 0;
+        balance -= principalPart;
+
+        const prepayAmt = prepayMap[key] || 0;
+        if (prepayAmt > 0) balance -= prepayAmt;
+        if (balance < 0) balance = 0;
+
+        rows.push({ month: i, dueDate, rate: currentRate, emi, principal: principalPart, interest, prepay: prepayAmt, balance });
+        if (balance <= 0) break;
+      }
+      return rows;
+    }
+
+    function calcPaidMonths(startDate, today) {
+      const startDay = startDate.getDate();
+      const diffMonths = (today.getFullYear() - startDate.getFullYear()) * 12 + (today.getMonth() - startDate.getMonth());
+      return today.getDate() >= startDay ? diffMonths + 1 : diffMonths;
+    }
+
+    function computeEventImpacts(principal, annualRate, years, startDate, prepays, rates, fixedEmi) {
+      const timeline = [];
+      prepays.forEach((p, i) => timeline.push({ type: 'prepay', idx: i, date: new Date(p.date + 'T00:00:00') }));
+      rates.forEach((r, i) => timeline.push({ type: 'rate', idx: i, date: new Date(r.date + 'T00:00:00') }));
+      timeline.sort((a, b) => a.date - b.date);
+
+      const baseSchedule = buildSchedule(principal, annualRate, years, startDate, [], [], fixedEmi);
+      function schedStats(s) {
+        return {
+          interest: s.reduce((sum, r) => sum + r.interest, 0),
+          emis: s.length,
+          lastDate: s.length > 0 ? s[s.length - 1].dueDate : startDate,
+        };
+      }
+
+      const cumPrepays = [], cumRates = [];
+      const stepResults = [{ prepays: [], rates: [], stats: schedStats(baseSchedule) }];
+
+      for (const event of timeline) {
+        if (event.type === 'prepay') cumPrepays.push(prepays[event.idx]);
+        else cumRates.push(rates[event.idx]);
+        const sched = buildSchedule(principal, annualRate, years, startDate, [...cumPrepays], [...cumRates], fixedEmi);
+        stepResults.push({ stats: schedStats(sched) });
+      }
+
+      const impacts = { prepay: [], rate: [] };
+      for (let step = 1; step < stepResults.length; step++) {
+        const event = timeline[step - 1];
+        const prev = stepResults[step - 1].stats;
+        const curr = stepResults[step].stats;
+        impacts[event.type][event.idx] = {
+          marginal: { interestSaved: prev.interest - curr.interest, emiReduced: prev.emis - curr.emis },
+          cumulative: { interestSaved: stepResults[0].stats.interest - curr.interest, emiReduced: stepResults[0].stats.emis - curr.emis, lastDate: curr.lastDate },
+        };
+      }
+      return impacts;
+    }
+
+    function renderEventsSummary(validEvents, impacts) {
+      const container = document.getElementById('eventsSummary');
+      const tbody = document.getElementById('eventsSummaryBody');
+
+      if (validEvents.length === 0) {
+        container.style.display = 'none';
+        return;
+      }
+
+      const rows = [];
+      let pi = 0, ri = 0;
+      validEvents.forEach(ev => {
+        if (ev.type === 'prepay' && impacts.prepay[pi]) {
+          rows.push({ ...ev, impact: impacts.prepay[pi] });
+          pi++;
+        } else if (ev.type === 'rate' && impacts.rate[ri]) {
+          rows.push({ ...ev, impact: impacts.rate[ri] });
+          ri++;
+        }
+      });
+
+      rows.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      tbody.innerHTML = rows.map(r => {
+        const isPrepay = r.type === 'prepay';
+        const detail = isPrepay ? formatMoney(r.value) : r.value + '%';
+        const m = r.impact.marginal;
+        const c = r.impact.cumulative;
+
+        const perEvent = [];
+        if (m.interestSaved !== 0) {
+          const cls = m.interestSaved > 0 ? 'saved' : 'cost';
+          const sym = m.interestSaved > 0 ? '↓' : '↑';
+          perEvent.push('<span class="' + cls + '">' + sym + ' ' + formatMoney(Math.abs(m.interestSaved)) + '</span>');
+        }
+        if (m.emiReduced !== 0) {
+          const cls = m.emiReduced > 0 ? 'saved' : 'cost';
+          const sym = m.emiReduced > 0 ? '↓' : '↑';
+          perEvent.push('<span class="' + cls + '">' + sym + ' ' + Math.abs(m.emiReduced) + ' EMI</span>');
+        }
+
+        const cumulative = [];
+        if (c.interestSaved !== 0) {
+          const cls = c.interestSaved > 0 ? 'saved' : 'cost';
+          const sym = c.interestSaved > 0 ? '↓' : '↑';
+          cumulative.push('<span class="' + cls + '">' + sym + ' ' + formatMoney(Math.abs(c.interestSaved)) + '</span>');
+        }
+        if (c.emiReduced !== 0) {
+          const cls = c.emiReduced > 0 ? 'saved' : 'cost';
+          const sym = c.emiReduced > 0 ? '↓' : '↑';
+          cumulative.push('<span class="' + cls + '">' + sym + ' ' + Math.abs(c.emiReduced) + ' EMI</span>');
+        }
+        return '<tr>' +
+          '<td style="font-weight:600">' + (isPrepay ? 'Prepayment' : 'Rate Change') + '</td>' +
+          '<td>' + formatDate(new Date(r.date + 'T00:00:00')) + '</td>' +
+          '<td>' + detail + '</td>' +
+          '<td>' + (perEvent.join(' · ') || '—') + '</td>' +
+          '<td>' + (cumulative.length ? cumulative.join(' · ') : '—') + '</td>' +
+          '<td>' + formatDate(c.lastDate) + '</td>' +
+        '</tr>';
+      }).join('');
+
+      container.style.display = 'block';
+    }
+
+    function saveToStorage() {
+      rebuildEvents();
+      const data = {
+        amount: amountInput.value,
+        rate: rateInput.value,
+        years: yearsInput.value,
+        startDate: startDateInput.value,
+        fixedEmi: fixedEmiInput.value,
+        currency: currencySelect.value,
+        events: events.filter(e => e.date && e.value > 0)
+      };
+      localStorage.setItem('loanCalc', JSON.stringify(data));
+    }
+
+    function runCalculation() {
+      errorDiv.textContent = '';
+      const principal = parseFloat(amountInput.value);
+      const annualRate = parseFloat(rateInput.value);
+      const years = parseFloat(yearsInput.value);
+      const startDateVal = startDateInput.value;
+
+      if (!principal || principal <= 0) {
+        errorDiv.textContent = 'Please enter a valid loan amount.';
+        return;
+      }
+      if (annualRate == null || annualRate < 0) {
+        errorDiv.textContent = 'Please enter a valid interest rate.';
+        return;
+      }
+      if (!years || years <= 0) {
+        errorDiv.textContent = 'Please enter a valid loan term.';
+        return;
+      }
+      if (!startDateVal) {
+        errorDiv.textContent = 'Please select a start date.';
+        return;
+      }
+
+      const startDate = new Date(startDateVal + 'T00:00:00');
+      const today = new Date();
+      const paidMonths = Math.min(Math.max(0, calcPaidMonths(startDate, today)), years * 12);
+
+      const calculatedEmi = calculateEMI(principal, annualRate, years);
+      const fixedEmi = parseFloat(fixedEmiInput.value);
+
+      if (fixedEmiInput.value && (isNaN(fixedEmi) || fixedEmi < calculatedEmi)) {
+        errorDiv.textContent = 'Fixed EMI must be greater than or equal to ' + formatMoney(calculatedEmi) + '.';
+        return;
+      }
+
+      const emi = fixedEmi > calculatedEmi ? fixedEmi : calculatedEmi;
+      const totalPaid = emi * years * 12;
+      const totalInterest = totalPaid - principal;
+
+      monthlyEl.textContent = formatMoney(emi);
+      totalEl.textContent = formatMoney(totalPaid);
+      interestEl.textContent = formatMoney(totalInterest);
+      resultsDiv.classList.add('show');
+
+      saveToStorage();
+
+      const validEvents = events.filter(e => e.date && e.value > 0);
+      const validPrepayments = validEvents.filter(e => e.type === 'prepay').map(e => ({ date: e.date, amount: e.value }));
+      const validRates = validEvents.filter(e => e.type === 'rate').map(e => ({ date: e.date, rate: e.value }));
+      const data = buildSchedule(principal, annualRate, years, startDate, validPrepayments, validRates, fixedEmi);
+      renderSchedule(data, paidMonths, validPrepayments.length > 0, validRates.length > 0, principal);
+      scheduleSection.classList.add('show');
+
+      const baseSchedule = buildSchedule(principal, annualRate, years, startDate, [], [], fixedEmi);
+      const originalEnd = baseSchedule.length > 0 ? baseSchedule[baseSchedule.length - 1].dueDate : startDate;
+      document.getElementById('originalEndDate').textContent = formatDate(originalEnd);
+
+      const hasAnyEvents = validPrepayments.length > 0 || validRates.length > 0;
+      if (hasAnyEvents) {
+        const impacts = computeEventImpacts(principal, annualRate, years, startDate, validPrepayments, validRates, fixedEmi);
+        renderEventsSummary(validEvents, impacts);
+      } else {
+        document.getElementById('eventsSummary').style.display = 'none';
+      }
+    }
+
+    function renderSchedule(rows, paidMonths, hasPrepay, hasRateChanges, principal) {
+      let emiPaid = 0, interestPaid = 0;
+      let currentBalance = 0;
+      let prevRate = rows.length > 0 ? rows[0].rate : null;
+
+      scheduleBody.innerHTML = rows.map((r, idx) => {
+        const isPaid = idx < paidMonths;
+        const isCurrent = idx === paidMonths;
+        const hasPrepayThis = r.prepay > 0;
+        const rateChanged = r.rate !== prevRate;
+        if (rateChanged) prevRate = r.rate;
+        if (isPaid) {
+          emiPaid += r.emi;
+          interestPaid += r.interest;
+        }
+        if (idx === paidMonths - 1) currentBalance = r.balance;
+        let cls = isPaid ? 'paid' : isCurrent ? 'active' : '';
+        if (hasPrepayThis) cls = (cls ? cls + ' ' : '') + 'prepay';
+        if (rateChanged && idx > 0) cls = (cls ? cls + ' ' : '') + 'rate-change';
+        return `
+        <tr class="${cls}">
+          <td>${r.month}</td>
+          <td>${formatDate(r.dueDate)}</td>
+          <td>${r.rate}%</td>
+          <td>${formatMoney(r.emi)}</td>
+          <td>${formatMoney(r.principal)}</td>
+          <td>${formatMoney(r.interest)}</td>
+          <td>${hasPrepayThis ? formatMoney(r.prepay) : '-'}</td>
+          <td>${formatMoney(r.balance)}</td>
+        </tr>`;
+      }).join('');
+
+      if (paidMonths === 0 && rows.length > 0) currentBalance = rows[0].balance;
+      else if (paidMonths > rows.length) currentBalance = 0;
+
+      const totalPrepayInPaid = rows.slice(0, paidMonths).reduce((s, r) => s + r.prepay, 0);
+      const principalPaid = principal - currentBalance - totalPrepayInPaid;
+      const totalPrincipalPaid = principalPaid + totalPrepayInPaid;
+
+      const extras = (hasPrepay ? ' with prepayments' : '') + (hasRateChanges ? ' with rate changes' : '');
+      scheduleCount.textContent = rows.length + ' months' + extras;
+      document.getElementById('sumEmisPaid').textContent = paidMonths;
+      document.getElementById('sumTotalEmi').textContent = formatMoney(emiPaid);
+      document.getElementById('sumPrincipalPaid').textContent = formatMoney(principalPaid);
+      document.getElementById('sumInterestPaid').textContent = formatMoney(interestPaid);
+      document.getElementById('sumPrepayments').textContent = formatMoney(totalPrepayInPaid);
+      document.getElementById('sumTotalPrincipalPaid').textContent = formatMoney(totalPrincipalPaid);
+      sumLeft.textContent = formatMoney(currentBalance);
+      sumEmisLeft.textContent = rows.length - paidMonths;
+      const lastEmiDate = rows.length > 0 ? rows[rows.length - 1].dueDate : null;
+      document.getElementById('sumLastEmiDate').textContent = lastEmiDate ? formatDate(lastEmiDate) : '—';
+    }
+
+    calculateBtn.addEventListener('click', runCalculation);
+
+    saveBtn.addEventListener('click', () => {
+      rebuildEvents();
+      saveToStorage();
+      showSaved();
+    });
+
+    function loadFromStorage() {
+      const raw = localStorage.getItem('loanCalc');
+      if (!raw) return false;
+      try {
+        const data = JSON.parse(raw);
+        if (data.amount) amountInput.value = data.amount;
+        if (data.rate) rateInput.value = data.rate;
+        if (data.years) yearsInput.value = data.years;
+        if (data.startDate) startDateInput.value = data.startDate;
+        if (data.fixedEmi) fixedEmiInput.value = data.fixedEmi;
+        if (data.currency) {
+          currencySelect.value = data.currency;
+          currencySymbol = data.currency;
+          document.querySelectorAll('.input-suffix[data-suffix]').forEach(el => {
+            if (['$', 'R$', '\u00A5', '\u00A3', '\u20AC', '\u20B9'].includes(el.dataset.suffix)) {
+              el.dataset.suffix = currencySymbol;
+            }
+          });
+        }
+        if (data.events && data.events.length) {
+          eventList.innerHTML = '';
+          events = [];
+          data.events.forEach(e => createEventEntry(e.type || 'prepay', e.date, e.value));
+        } else if (data.prepayments && data.prepayments.length) {
+          eventList.innerHTML = '';
+          events = [];
+          data.prepayments.forEach(p => createEventEntry('prepay', p.date, p.amount));
+          if (data.rateChanges && data.rateChanges.length) {
+            data.rateChanges.forEach(r => createEventEntry('rate', r.date, r.rate));
+          }
+        }
+        return true;
+      } catch(e) {
+        return false;
+      }
+    }
+
+    if (!loadFromStorage()) {
+      startDateInput.value = '2024-04-05';
+    }
+
+    document.getElementById('downloadPdf').addEventListener('click', () => {
+      const existing = document.querySelector('.print-only');
+      if (existing) existing.remove();
+
+      const wrap = document.querySelector('.schedule-wrap');
+      wrap.style.maxHeight = 'none';
+      wrap.style.overflow = 'visible';
+
+      const printContainer = document.getElementById('scheduleSection').cloneNode(true);
+      printContainer.classList.add('print-only');
+
+      const formSummary = document.createElement('div');
+      formSummary.style.cssText = 'padding:0 0 16px 0;font-family:sans-serif;font-size:13px;color:#333';
+      let eventsHtml = '';
+      const validEvts = events.filter(e => e.date && e.value > 0);
+      if (validEvts.length) {
+        const prepayEvts = validEvts.filter(e => e.type === 'prepay');
+        const rateEvts = validEvts.filter(e => e.type === 'rate');
+        if (prepayEvts.length) {
+          eventsHtml += '<div style="margin-top:6px"><strong>Prepayments:</strong> ' +
+            prepayEvts.map(e => formatDate(new Date(e.date + 'T00:00:00')) + ' - ' + formatMoney(e.value)).join(' | ') + '</div>';
+        }
+        if (rateEvts.length) {
+          eventsHtml += '<div style="margin-top:6px"><strong>Rate Changes:</strong> ' +
+            rateEvts.map(e => formatDate(new Date(e.date + 'T00:00:00')) + ' - ' + e.value + '%').join(' | ') + '</div>';
+        }
+      }
+      formSummary.innerHTML = `
+        <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:12px">
+          <div><strong>Loan Amount:</strong> ${formatMoney(parseFloat(amountInput.value))}</div>
+          <div><strong>Rate:</strong> ${rateInput.value}%</div>
+          <div><strong>Term:</strong> ${yearsInput.value} yrs</div>
+          <div><strong>Start Date:</strong> ${formatDate(new Date(startDateInput.value + 'T00:00:00'))}</div>
+          <div><strong>EMI:</strong> ${monthlyEl.textContent}</div>
+        </div>
+        ${eventsHtml}
+      `;
+      printContainer.prepend(formSummary);
+
+      document.body.appendChild(printContainer);
+
+      setTimeout(() => {
+        window.print();
+        document.body.removeChild(printContainer);
+        wrap.style.maxHeight = '';
+        wrap.style.overflow = '';
+      }, 100);
+    });
+  </script>
+</body>
+</html>

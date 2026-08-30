@@ -1,0 +1,187 @@
+/* ==========================================================================
+   vitti — base.css
+   Shared design tokens, reset and typography.
+   Every page on vittimoney.com should load this file first, before its
+   own page-specific stylesheet, so cards/buttons/type stay consistent
+   as new tools get added.
+   ========================================================================== */
+
+:root{
+  /* ---- color: dark (default) ---- */
+  --bg:#0A0B0D;
+  --panel:#131519;
+  --panel-hover:#181B20;
+  --border:rgba(255,255,255,0.08);
+  --border-strong:rgba(255,255,255,0.14);
+  --text:#EDEDEF;
+  --text-muted:#8B8F98;
+  --text-faint:#54585F;
+  --accent:#C9A15A;
+  --accent-soft:rgba(201,161,90,0.12);
+  --live-dot:#4FB07A;
+
+  /* ---- shape / elevation ---- */
+  --radius-sm:8px;
+  --radius:14px;
+  --radius-lg:20px;
+  --shadow:0 1px 2px rgba(0,0,0,0.4), 0 12px 32px rgba(0,0,0,0.28);
+
+  /* ---- type scale ---- */
+  --font-display:'Inter', sans-serif;
+  --font-body:'Inter', sans-serif;
+  --font-mono:'JetBrains Mono', monospace;
+
+  /* ---- motion ---- */
+  --ease:cubic-bezier(.3,.8,.4,1);
+}
+
+html[data-theme="light"]{
+  --bg:#F6F6F4;
+  --panel:#FFFFFF;
+  --panel-hover:#FBFAF8;
+  --border:rgba(10,11,13,0.08);
+  --border-strong:rgba(10,11,13,0.14);
+  --text:#14161A;
+  --text-muted:#66696F;
+  --text-faint:#A2A5AA;
+  --accent:#9C7A3C;
+  --accent-soft:rgba(156,122,60,0.10);
+  --live-dot:#2C9760;
+  --shadow:0 1px 2px rgba(20,22,26,0.04), 0 12px 28px rgba(20,22,26,0.06);
+}
+
+/* ---- reset ---- */
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ -webkit-font-smoothing:antialiased; scroll-behavior:smooth; }
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  transition:background 0.25s ease, color 0.25s ease;
+  min-height:100vh;
+}
+img,svg{ display:block; max-width:100%; }
+a{ color:inherit; }
+
+.container{
+  max-width:1320px;
+  margin:0 auto;
+  padding:0 32px;
+}
+@media (max-width:640px){ .container{ padding:0 18px; } }
+
+@media (prefers-reduced-motion:reduce){
+  html{ scroll-behavior:auto; }
+  *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+}
+
+/* ---- shared primitives, used on every page ---- */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-size:14px;
+  font-weight:600;
+  padding:13px 22px;
+  border-radius:9px;
+  text-decoration:none;
+  border:none;
+  cursor:pointer;
+  transition:transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, filter 0.15s ease;
+}
+.btn-primary{ background:var(--accent); color:#0A0B0D; }
+.btn-primary:hover{ transform:translateY(-1px); filter:brightness(1.08); }
+.btn-ghost{ background:transparent; border:1px solid var(--border-strong); color:var(--text); }
+.btn-ghost:hover{ background:var(--panel); }
+
+/* ---- shared nav + theme toggle (every page has these) ---- */
+nav{
+  position:sticky;
+  top:0;
+  z-index:20;
+  background:color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+}
+.nav-inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  height:68px;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  font-family:var(--font-display);
+  font-size:19px;
+  font-weight:700;
+  letter-spacing:-0.01em;
+  text-decoration:none;
+  color:var(--text);
+}
+.brand-mark{
+  width:27px;
+  height:27px;
+  border-radius:8px;
+  background:linear-gradient(135deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 72%, #E8C88A) 100%);
+  color:#0A0B0D;
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:15px;
+  line-height:1;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 1px 3px rgba(0,0,0,0.3), inset 0 0 0 1px rgba(255,255,255,0.22);
+  transition:transform 0.15s var(--ease), filter 0.15s ease;
+}
+.brand:hover .brand-mark{ transform:translateY(-1px); filter:brightness(1.06); }
+
+.nav-links{
+  display:flex;
+  align-items:center;
+  gap:36px;
+  font-size:14px;
+  color:var(--text-muted);
+}
+.nav-links a{ color:var(--text-muted); text-decoration:none; transition:color 0.15s ease; }
+.nav-links a:hover{ color:var(--text); }
+@media (max-width:720px){ .nav-links a.hide-sm{ display:none; } }
+
+.theme-toggle{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:5px;
+}
+.theme-toggle button{
+  all:unset;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:28px; height:28px;
+  border-radius:16px;
+  color:var(--text-faint);
+  cursor:pointer;
+  transition:background 0.15s ease, color 0.15s ease;
+}
+.theme-toggle button.active{ background:var(--accent-soft); color:var(--accent); }
+.theme-toggle svg{ width:15px; height:15px; }
+
+footer{
+  margin-top:70px;
+  padding:34px 0 48px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:12px;
+  font-family:var(--font-mono);
+  font-size:11.5px;
+  color:var(--text-faint);
+  border-top:1px solid var(--border);
+}

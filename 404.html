@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page not found — VittiMoney</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/base.css">
+<style>
+  .nf{
+    min-height:calc(100vh - 68px);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:64px 24px;
+  }
+  .nf-code{
+    font-family:var(--font-mono);
+    font-size:13px;
+    letter-spacing:0.18em;
+    color:var(--accent);
+    text-transform:uppercase;
+    padding:7px 14px;
+    border:1px solid var(--border-strong);
+    border-radius:20px;
+    margin-bottom:24px;
+  }
+  .nf h1{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:clamp(30px,4.4vw,52px);
+    letter-spacing:-0.02em;
+    line-height:1.08;
+    max-width:22ch;
+  }
+  .nf p{
+    margin-top:14px;
+    font-size:15.5px;
+    color:var(--text-muted);
+    max-width:44ch;
+    line-height:1.6;
+  }
+  .nf .btn{ margin-top:32px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="container nav-inner">
+    <a href="index.html" class="brand"><span class="brand-mark">v</span>VittiMoney</a>
+    <div class="nav-links">
+      <a href="calculators/index.html" class="hide-sm">Tools</a>
+      <a href="about/index.html" class="hide-sm">About</a>
+    </div>
+  </div>
+</nav>
+
+<main class="container">
+  <div class="nf">
+    <div class="nf-code">404 · Not found</div>
+    <h1>This page drifted off the balance sheet.</h1>
+    <p>The address you followed doesn't exist. Head back to the homepage and pick up where you left off.</p>
+    <a href="index.html" class="btn btn-primary">Back to home</a>
+  </div>
+</main>
+
+</body>
+</html>
